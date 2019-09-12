@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>hasmap | 张智伟的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="hashmap源码实现及其使用分析hashmap 储存结构常量、成员变量构造函数关键方法准备工作hashcode获取tablesizefor 任何数转2幂次方红黑树 特征  节点不是红就是黑 根节点与叶子节点都为黑色（叶子结点是指空节点） 红色节点下为2个黑色 任意一个节点到另一个节点的黑色相同（黑亮）   优点  类似于平衡二叉树，所以查找、插入效率提高 对二叉树进行的简化使查找、插入更加方便">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hasmap">
+<meta property="og:url" content="http://yoursite.com/2019/09/12/hasmap/index.html">
+<meta property="og:site_name" content="张智伟的博客">
+<meta property="og:description" content="hashmap源码实现及其使用分析hashmap 储存结构常量、成员变量构造函数关键方法准备工作hashcode获取tablesizefor 任何数转2幂次方红黑树 特征  节点不是红就是黑 根节点与叶子节点都为黑色（叶子结点是指空节点） 红色节点下为2个黑色 任意一个节点到另一个节点的黑色相同（黑亮）   优点  类似于平衡二叉树，所以查找、插入效率提高 对二叉树进行的简化使查找、插入更加方便">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2019-09-12T06:07:05.540Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="hasmap">
+<meta name="twitter:description" content="hashmap源码实现及其使用分析hashmap 储存结构常量、成员变量构造函数关键方法准备工作hashcode获取tablesizefor 任何数转2幂次方红黑树 特征  节点不是红就是黑 根节点与叶子节点都为黑色（叶子结点是指空节点） 红色节点下为2个黑色 任意一个节点到另一个节点的黑色相同（黑亮）   优点  类似于平衡二叉树，所以查找、插入效率提高 对二叉树进行的简化使查找、插入更加方便">
+  
+    <link rel="alternate" href="/atom.xml" title="张智伟的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">张智伟的博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-hasmap" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/09/12/hasmap/" class="article-date">
+  <time datetime="2019-09-12T06:06:02.000Z" itemprop="datePublished">2019-09-12</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      hasmap
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="hashmap源码实现及其使用分析"><a href="#hashmap源码实现及其使用分析" class="headerlink" title="hashmap源码实现及其使用分析"></a>hashmap源码实现及其使用分析</h1><h2 id="hashmap-储存结构"><a href="#hashmap-储存结构" class="headerlink" title="hashmap 储存结构"></a>hashmap 储存结构</h2><h2 id="常量、成员变量"><a href="#常量、成员变量" class="headerlink" title="常量、成员变量"></a>常量、成员变量</h2><h2 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h2><h2 id="关键方法"><a href="#关键方法" class="headerlink" title="关键方法"></a>关键方法</h2><h3 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h3><h4 id="hashcode获取"><a href="#hashcode获取" class="headerlink" title="hashcode获取"></a>hashcode获取</h4><h4 id="tablesizefor-任何数转2幂次方"><a href="#tablesizefor-任何数转2幂次方" class="headerlink" title="tablesizefor 任何数转2幂次方"></a>tablesizefor 任何数转2幂次方</h4><h4 id="红黑树"><a href="#红黑树" class="headerlink" title="红黑树"></a>红黑树</h4><ol>
+<li><p>特征</p>
+<ul>
+<li>节点不是红就是黑</li>
+<li>根节点与叶子节点都为黑色（叶子结点是指空节点）</li>
+<li>红色节点下为2个黑色</li>
+<li>任意一个节点到另一个节点的黑色相同（黑亮）</li>
+</ul>
+</li>
+<li><p>优点</p>
+<ul>
+<li>类似于平衡二叉树，所以查找、插入效率提高</li>
+<li>对二叉树进行的简化使查找、插入更加方便</li>
+</ul>
+</li>
+<li><p>调整</p>
+<ul>
+<li>颜色调整：变化颜色（==其中插入时都为红色 防止违反特征最后一条==）</li>
+<li>结构调整：左旋 右旋(==红黑树的左右旋是比较重要的操作，左右旋的目的是调整红黑节点结构，转移黑色节点位置，使其在进行插入、删除后仍能保持红黑树的 5 条性质==)<ul>
+<li>详细调整介绍<ul>
+<li><a href="https://www.cnblogs.com/yinbiao/p/10732600.html" target="_blank" rel="noopener">详细分析很详细清晰</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>TreeNode 类</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">TreeNode</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">extends</span> <span class="title">LinkedHashMap</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">// 父节点</span></span><br><span class="line">    TreeNode&lt;K,V&gt; parent;  <span class="comment">// red-black tree links</span></span><br><span class="line">    <span class="comment">// 左子节点</span></span><br><span class="line">    TreeNode&lt;K,V&gt; left;</span><br><span class="line">    <span class="comment">// 右子节点</span></span><br><span class="line">    TreeNode&lt;K,V&gt; right;</span><br><span class="line">    <span class="comment">// 前节点</span></span><br><span class="line">    TreeNode&lt;K,V&gt; prev;    <span class="comment">// needed to unlink next upon deletion</span></span><br><span class="line">    <span class="keyword">boolean</span> red;<span class="comment">//是否为红色</span></span><br><span class="line">    TreeNode(<span class="keyword">int</span> hash, K key, V val, Node&lt;K,V&gt; next) &#123;</span><br><span class="line">        <span class="keyword">super</span>(hash, key, val, next);</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><h3 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h3><h4 id="put"><a href="#put" class="headerlink" title="put"></a>put</h4><h5 id="关键、流程分析"><a href="#关键、流程分析" class="headerlink" title="关键、流程分析"></a>关键、流程分析</h5><h5 id="源码分析-1"><a href="#源码分析-1" class="headerlink" title="源码分析"></a>源码分析</h5><h5 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h5><h4 id="get"><a href="#get" class="headerlink" title="get"></a>get</h4><h5 id="关键、流程分析-1"><a href="#关键、流程分析-1" class="headerlink" title="关键、流程分析"></a>关键、流程分析</h5><h5 id="源码分析-2"><a href="#源码分析-2" class="headerlink" title="源码分析"></a>源码分析</h5><h5 id="小结-1"><a href="#小结-1" class="headerlink" title="小结"></a>小结</h5><h4 id="remove"><a href="#remove" class="headerlink" title="remove"></a>remove</h4><h5 id="关键、流程分析-2"><a href="#关键、流程分析-2" class="headerlink" title="关键、流程分析"></a>关键、流程分析</h5><h5 id="源码分析-3"><a href="#源码分析-3" class="headerlink" title="源码分析"></a>源码分析</h5><h5 id="小结-2"><a href="#小结-2" class="headerlink" title="小结"></a>小结</h5><h4 id="resize"><a href="#resize" class="headerlink" title="resize"></a>resize</h4><h5 id="关键、流程分析-3"><a href="#关键、流程分析-3" class="headerlink" title="关键、流程分析"></a>关键、流程分析</h5><h5 id="源码分析-4"><a href="#源码分析-4" class="headerlink" title="源码分析"></a>源码分析</h5><h5 id="小结-3"><a href="#小结-3" class="headerlink" title="小结"></a>小结</h5></li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/09/12/hasmap/" data-id="ck0gajhiu0000f8vjwckrxc9n" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2019/09/12/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Hello World</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/09/12/hasmap/">hasmap</a>
+          </li>
+        
+          <li>
+            <a href="/2019/09/12/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 张智伟<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
